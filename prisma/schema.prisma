@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // url      = env("DB_USER")
+  relationMode = "prisma"
+}
+
+model User {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  userName String
+  password String
+  // current level
+  level Int
+  // next level
+  nextLevel Int
+  // experience current
+  experience Decimal
+  //* skills
+  // experience to work
+  job Int
+  // experience to wars
+  war Int
+  // experience to store
+  store Int
+
+  email String @unique
+  admin Boolean
+}
+
+model StoreUser {
+  id String @id @default(uuid())
+  //* store
+  // store of gold
+  gold Int
+  // store of cobre
+  cobre Int
+  // store of carbon
+  carbon Int
+  // store of esmeralda
+  esmeralda Int
+  // store of hierro
+  hierro Int
+  // store of niquel
+  niquel Int
+  // store of plata
+  plata Int
+  // store of platino
+  platino Int
+}
+model Country {
+  id String @id @default(uuid())
+  name String
+  image String
+}
+
+model Region {
+  id String @id @default(uuid())
+  name String
+  image String
+
+  departamentId String @unique
+  departament Departament @relation(fields: [departamentId], references: [id])
+}
+model StoreRegions {
+  id String @id @default(uuid())
+  //* store
+  // store of gold
+  gold Int
+  // store of cobre
+  cobre Int
+  // store of carbon
+  carbon Int
+  // store of esmeralda
+  esmeralda Int
+  // store of hierro
+  hierro Int
+  // store of niquel
+  niquel Int
+  // store of plata
+  plata Int
+  // store of platino
+  platino Int
+}
+model Departament {
+  id String @id @default(uuid())
+  name String
+  image String
+
+  gold Boolean
+  cobre Boolean
+  carbon Boolean
+  esmeralda Boolean
+  hierro Boolean
+  niquel Boolean
+  plata Boolean
+  platino Boolean
+
+  region Region[]
+}
+
+model Factory {
+  id String @id @default(uuid()) 
+  name String
+  tipo String
+  level Int
+  experience Decimal
+  capacity Int
+}
+
+model Store {
+  id String @id @default(uuid())
+  resource String
+
+}
