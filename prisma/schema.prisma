@@ -12,7 +12,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
   // url      = env("DB_USER")
-  relationMode = "prisma"
 }
 
 model User {
@@ -34,93 +33,132 @@ model User {
   war Int
   // experience to store
   store Int
+//* fin skills
 
   email String @unique
   admin Boolean
+  ipAddress String
+  //Relacion con userStore
+  userStore UserStore @relation(fields: [userStoreId], references: [id])
+  userStoreId String
+  // relacion con Factory
+  factories Factory[]
+  // relacion con Party
+  party Party @relation(fields: [partyId], references: [id])
+  partyId String
+  // relacion con Faccion
+  faction Faction @relation(fields: [factionId], references: [id])
+  factionId String
 }
 
-model StoreUser {
+model UserStore {
   id String @id @default(uuid())
-  //* store
-  // store of gold
-  gold Int
-  // store of cobre
-  cobre Int
-  // store of carbon
-  carbon Int
-  // store of esmeralda
-  esmeralda Int
-  // store of hierro
-  hierro Int
-  // store of niquel
-  niquel Int
-  // store of plata
-  plata Int
-  // store of platino
-  platino Int
+  gold Int //oro
+  copper Int // cobre
+  carbon Int //carbon
+  emerald Int // esmeralda
+  iron Int //hierro
+  nickel Int //niquel
+  silver Int //plata
+  platinum Int //platino
+  army Int // ejercito
+  armada Int // Armada 
+  airForce Int //Fuerza Aérea
+  //relacion unversa con user
+  users User[]
 }
-model Country {
+model Factory {
   id String @id @default(uuid())
   name String
-  image String
-}
-
-model Region {
-  id String @id @default(uuid())
-  name String
-  image String
-
-  departamentId String @unique
+    // Material producido por la fábrica
+  producedMaterial String
+    // Materiales requeridos para producir
+  requiredGold Int
+  requiredCopper Int
+  requiredCarbon Int
+  requiredEmerald Int
+  requiredIron Int
+  requiredNickel Int
+  requiredSilver Int
+  requiredPlatinum Int
+    // Tiempo de producción en segundos
+  productionTime Int
+    // Nivel requerido para construir la fábrica
+  requiredLevel Int
+    // Costo de construcción de la fábrica
+  constructionCost Int
+    // Cantidad de recurso producido por unidad de tiempo
+  productionRate Int
+  // Usuario que creó la fábrica
+  createdBy String
+  user User @relation(fields: [createdBy], references: [id])
+   // Departamento en el que se encuentra la fábrica
+  departamentId String
   departament Departament @relation(fields: [departamentId], references: [id])
-}
-model StoreRegions {
-  id String @id @default(uuid())
-  //* store
-  // store of gold
-  gold Int
-  // store of cobre
-  cobre Int
-  // store of carbon
-  carbon Int
-  // store of esmeralda
-  esmeralda Int
-  // store of hierro
-  hierro Int
-  // store of niquel
-  niquel Int
-  // store of plata
-  plata Int
-  // store of platino
-  platino Int
 }
 model Departament {
   id String @id @default(uuid())
   name String
-  image String
-
-  gold Boolean
-  cobre Boolean
-  carbon Boolean
-  esmeralda Boolean
-  hierro Boolean
-  niquel Boolean
-  plata Boolean
-  platino Boolean
-
-  region Region[]
+  // Materiales para extraer mediante fábricas
+  gold Int @default(0)
+  copper Int @default(0)
+  carbon Int @default(0)
+  emerald Int @default(0)
+  iron Int @default(0)
+  nickel Int @default(0)
+  silver Int @default(0)
+  platinum Int @default(0)
+  // Items para mejorar
+  defense Int @default(1) //defensa
+  attack Int @default(1) //ataque
+  health Int @default(1) //salud
+  education Int @default(1) // educacion
+  progress Int @default(1) // progreso
+  // Restricción de existencia de materiales
+  maxGold Int @default(1)
+  maxCopper Int @default(1)
+  maxCarbon Int @default(1)
+  maxEmerald Int @default(1)
+  maxIron Int @default(1)
+  maxNickel Int @default(1)
+  maxSilver Int @default(1)
+  maxPlatinum Int @default(1)
+  factories Factory[]
+  // Relación con la región a la que pertenece
+  region Region?
+  // Relación inversa para la relación addedDepartments en Region
+  regions Region[] @relation(name: "RegionDepartments")
+  // relacion con party
+  party Party[]
+  // relacion con faction
+  faction Faction[]
+  
 }
-
-model Factory {
-  id String @id @default(uuid()) 
-  name String
-  tipo String
-  level Int
-  experience Decimal
-  capacity Int
-}
-
-model Store {
+model Region {
   id String @id @default(uuid())
-  resource String
-
+  name String
+  capital String @unique
+  capitalDepartament Departament @relation(fields: [capital], references: [id])
+  // Departamentos agregados a la región
+  addedDepartments Departament[] @relation(name: "RegionDepartments")
 }
+model Party {
+  id       String   @id @default(uuid())
+  name     String
+  ideology String
+  // Departamento al que pertenece el partido
+  department  Departament @relation(fields: [departmentId], references: [id])
+  departmentId String
+  // Usuarios que pertenecen a este partido
+  users       User[]
+}
+model Faction {
+  id     String @id @default(uuid())
+  name   String
+  // Departamento al que pertenece la facción
+  departmentId String
+  department Departament @relation(fields: [departmentId], references: [id])
+  // Usuarios que pertenecen a esta facción
+  users User[]
+}
+
